@@ -28,6 +28,14 @@ void DrawingCanvas::OnPaint(wxPaintEvent& WXUNUSED(evt)) {
     gc->SetBrush(*wxRED_BRUSH);
     gc->DrawRectangle(rectOrigin.x, rectOrigin.y,
         rectSize.GetWidth(), rectSize.GetHeight());
+    
+    gc->SetFont(*wxNORMAL_FONT, *wxWHITE);
+    wxString text = "Texto";
+
+    double textWidth, textHeight;
+    gc->GetTextExtent(text, &textWidth, &textHeight); // Obtain text size to center it properly
+ 
+    gc->DrawText(text, rectOrigin.x + rectSize.GetWidth() / 2.0 - textWidth/2.0 , rectOrigin.y + rectSize.GetHeight() / 2.0 - textHeight/ 2.0 );
 
     delete gc;
 }
