@@ -9,7 +9,28 @@ DrawingCanvas::DrawingCanvas(wxWindow* parent, wxWindowID id,
     : wxWindow(parent, id, pos, size, wxFULL_REPAINT_ON_RESIZE)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
+
     Bind(wxEVT_PAINT, &DrawingCanvas::OnPaint, this);
+
+    addRect(this->FromDIP(100), this->FromDIP(80), this->FromDIP(210), this->FromDIP(140), 0 ,*wxRED, "Primero");
+    addRect(this->FromDIP(130), this->FromDIP(110), this->FromDIP(280), this->FromDIP(280), M_PI/3.0, *wxBLUE, "Segundo");
+    // wxColor(R,G,B,T)
+    addRect(this->FromDIP(110), this->FromDIP(110), this->FromDIP(300), this->FromDIP(120), -M_PI/4.0, wxColor(255,0,255,128), "Tercero");
+}
+
+void DrawingCanvas::addRect(int width, int height, int centerX, int centerY, double angle, wxColor color, const std::string& text){
+    GraphicObject obj{
+        {-width / 2.0, -height / 2.0, static_cast<double>(width), static_cast<double>(height)},
+        color,
+        text,
+        {}};
+
+        obj.transform.Translate(static_cast<double>(centerX), static_cast<double>(centerY));
+        obj.transform.Rotate(angle);
+
+        this->objectList.push_back(obj);
+
+        Refresh(); //Refresh Window with the new object
 }
 
 //WXUNUSED avoids unused parameters warnings
@@ -21,30 +42,20 @@ void DrawingCanvas::OnPaint(wxPaintEvent& WXUNUSED(evt)) {
     if (!gc)
         return;
 
-    // DIP = Density Independent Pixels; aquí la ventana ya existe, así que es seguro.    
-    wxSize rectSize = FromDIP(wxSize(100, 80));
-    wxPoint rectOrigin = { -rectSize.GetWidth() / 2, -rectSize.GetHeight() / 2 };
+    for (const auto& object : objectList) {
 
-    // Affine Transformation class to create TRS movements to the rectangles (Traslate,Rotate & Scale)
-    wxAffineMatrix2D transform{};
-    transform.Translate(100, 130);
-    transform.Rotate(M_PI / 3.0); //radians
-    transform.Scale(3, 3);
+        // Uses the aplied transform
+        gc->SetTransform(gc->CreateMatrix(object.transform));
 
-    // Uses the aplied transform
-    gc->SetTransform(gc->CreateMatrix(transform));
+        gc->SetBrush(wxBrush(object.color));
+        gc->DrawRectangle(object.rect.m_x, object.rect.m_y, object.rect.m_width, object.rect.m_height);
 
-    gc->SetBrush(*wxRED_BRUSH);
-    gc->DrawRectangle(rectOrigin.x, rectOrigin.y,
-        rectSize.GetWidth(), rectSize.GetHeight());
-    
-    gc->SetFont(*wxNORMAL_FONT, *wxWHITE);
-    wxString text = "Texto";
+        gc->SetFont(*wxNORMAL_FONT, *wxWHITE);
 
-    double textWidth, textHeight;
-    gc->GetTextExtent(text, &textWidth, &textHeight); // Obtain text size to center it properly
- 
-    gc->DrawText(text, rectOrigin.x + rectSize.GetWidth() / 2.0 - textWidth/2.0 , rectOrigin.y + rectSize.GetHeight() / 2.0 - textHeight/ 2.0 );
+        double textWidth, textHeight;
+        gc->GetTextExtent(object.text, &textWidth, &textHeight); // Obtain text size to center it properly
 
+        gc->DrawText(object.text, object.rect.m_x + object.rect.m_width / 2.0 - textWidth / 2.0, object.rect.m_y + object.rect.m_height / 2.0 - textHeight / 2.0);
+    }
     delete gc;
 }
