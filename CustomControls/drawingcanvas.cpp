@@ -21,9 +21,18 @@ void DrawingCanvas::OnPaint(wxPaintEvent& WXUNUSED(evt)) {
     if (!gc)
         return;
 
-    // DIP = Density Independent Pixels; aquí la ventana ya existe, así que es seguro.
-    wxPoint rectOrigin = FromDIP(wxPoint(189, 200));
+    // DIP = Density Independent Pixels; aquí la ventana ya existe, así que es seguro.    
     wxSize rectSize = FromDIP(wxSize(100, 80));
+    wxPoint rectOrigin = { -rectSize.GetWidth() / 2, -rectSize.GetHeight() / 2 };
+
+    // Affine Transformation class to create TRS movements to the rectangles (Traslate,Rotate & Scale)
+    wxAffineMatrix2D transform{};
+    transform.Translate(100, 130);
+    transform.Rotate(M_PI / 3.0); //radians
+    transform.Scale(3, 3);
+
+    // Uses the aplied transform
+    gc->SetTransform(gc->CreateMatrix(transform));
 
     gc->SetBrush(*wxRED_BRUSH);
     gc->DrawRectangle(rectOrigin.x, rectOrigin.y,
