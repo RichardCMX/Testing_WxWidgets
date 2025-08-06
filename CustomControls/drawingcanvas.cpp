@@ -77,7 +77,7 @@ void DrawingCanvas::OnPaint(wxPaintEvent& WXUNUSED(evt))
 // clickedObjetIter search on the list the top rectangle using the lambda function
 
 // Lambda syntax
-// [external pam](parameters){code}
+// [external param](parameters){code}
 void DrawingCanvas::OnMouseDown(wxMouseEvent& event)
 {
     auto clickedObjectIter = std::find_if(objectList.rbegin(), objectList.rend(),
@@ -108,15 +108,46 @@ void DrawingCanvas::OnMouseDown(wxMouseEvent& event)
     }
 }
 
+// If should rotate check if its up/down to make clockwise or counterclockwise
 void DrawingCanvas::OnMouseMove(wxMouseEvent& event)
 {
-
+    if (draggedObj != nullptr) {
+        if (shouldRotate) {
+            double absoluteYdiff = event.GetPosition().y - lastDragOrigin.m_y;
+            draggedObj->transform.Rotate(absoluteYdiff / 100 * M_PI);
+        }
+        else {
+            auto dragVector = event.GetPosition() - lastDragOrigin;
+            auto inv = draggedObj->transform;
+            inv.Invert();
+            dragVector = inv.TransformDistance(dragVector);
+            draggedObj->transform.Translate(dragVector.m_x, dragVector.m_y);
+        }
+        lastDragOrigin = event.GetPosition();
+        Refresh();
+    }
 }
 
 void DrawingCanvas::OnMouseUp(wxMouseEvent& event)
 {
+    finishDrag();
+    finishRotation();
 }
 
 void DrawingCanvas::OnMouseLeave(wxMouseEvent& event)
 {
+    finishDrag();
+    finishRotation();
 }
+
+void DrawingCanvas::finishDrag()
+{
+    draggedObj = nullptr;
+}
+
+void DrawingCanvas::finishRotation()
+{
+    shouldRotate = false;
+}
+
+

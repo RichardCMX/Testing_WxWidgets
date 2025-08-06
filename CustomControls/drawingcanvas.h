@@ -21,7 +21,7 @@ private:
 	void OnMouseLeave(wxMouseEvent& event);
 
 	void finishDrag();
-	void finshRotation();
+	void finishRotation();
 
 	std::list<GraphicObject> objectList;
 
