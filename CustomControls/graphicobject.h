@@ -3,7 +3,8 @@
 
 #include <wx/wx.h>
 
-struct GraphicObject {
+struct GraphicObject
+{
 	wxRect2DDouble rect;
 	wxColor color;
 	wxString text;
