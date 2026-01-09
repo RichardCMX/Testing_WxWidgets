@@ -56,7 +56,12 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size) 
 		{{2,1},{1,1}},
 		{{0,2},{4,1}}};
 	for (auto& item : items) {
-		auto p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, sizer->GetEmptyCellSize());
+		auto initialSize = sizer->GetEmptyCellSize() * 2;
+		if (item.first == wxGBPosition(1, 0)) {
+			initialSize.SetWidth(FromDIP(200));
+		}
+
+		auto p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, initialSize);
 		p->SetBackgroundColour(wxColour(100, 100, 200));
 		sizer->Add(p, item.first, item.second, wxEXPAND);
 	}
