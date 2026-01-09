@@ -45,7 +45,21 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size) 
 	const auto margin = FromDIP(10);
 	auto mainSizer = new wxBoxSizer(wxVERTICAL);
 	wxPanel* panel = new wxPanel(this, wxID_ANY);
+	this->SetBackgroundColour(panel->GetBackgroundColour());
+
+	/*
 	auto sizer = new wxGridSizer(form.size(), 2, margin, margin);
+	*/
+	auto sizer = new wxFlexGridSizer(form.size(), 2, margin, margin);
+	sizer->AddGrowableCol(1); //Second column growable
+
+	//set growable row for multiline input
+	for (size_t i = 0; i < form.size(); i++) {
+		if (form[i].second == InputType::MultiLine)
+		{
+			sizer->AddGrowableRow(i);
+		}
+	}
 
 	for (const auto &[label, type]: form)
 	{
@@ -57,9 +71,10 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size) 
 
 		sizer->Add(inputCtrl, 1, wxEXPAND);
 	}
+
+	sizer->SetMinSize(FromDIP(400), wxDefaultSize.GetHeight());
 	panel->SetSizer(sizer);
 
 	mainSizer->Add(panel, 1, wxEXPAND | wxALL, margin);
-
-	this->SetSizer(mainSizer);
+	this->SetSizerAndFit(mainSizer);
 }
