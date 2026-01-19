@@ -60,7 +60,6 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size) 
 		if (item.first == wxGBPosition(1, 0)) {
 			initialSize.SetWidth(FromDIP(200));
 		}
-
 		auto p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, initialSize);
 		p->SetBackgroundColour(wxColour(100, 100, 200));
 		sizer->Add(p, item.first, item.second, wxEXPAND);
